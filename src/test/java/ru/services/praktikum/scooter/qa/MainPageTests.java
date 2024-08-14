@@ -36,7 +36,7 @@ public class MainPageTests extends MainPage {
         objMainPage.arrowPointerPriceClick();
         arrowPointerText = objMainPage.arrowPointerPriceGetText();
 
-        Assert.assertEquals(arrowPointerText, "Сутки — 400 рублей. Оплата курьеру — наличными или картой.");
+        Assert.assertEquals("Сутки — 400 рублей. Оплата курьеру — наличными или картой.", arrowPointerText);
     }
 
     // Тест проверяет что при нажатии на логотип «Самоката», попадаешь на главную страницу «Самоката»
