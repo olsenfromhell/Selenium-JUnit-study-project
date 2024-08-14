@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import ru.services.praktikum.EnvConfig;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -19,8 +20,6 @@ public class MainPage {
     public MainPage() {
     }
 
-    // URL главной страницы сайта
-    protected String mainPageUrl = "https://qa-scooter.praktikum-services.ru/";
     // Кнопка принятия кук
     private final By acceptCookieBtn = By.id("rcc-confirm-button");
     // Аккордеон
@@ -37,9 +36,9 @@ public class MainPage {
     private final By orderStatusField = By.cssSelector("input[placeholder='Введите номер заказа']");
     private final By orderStatusGoBtn = By.xpath("//*[contains(@class,'Button_Button')][contains(text(),'Go!')]");
 
-
-    void waitForPageLoaded() {
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+    public void openMainPage() {
+        driver.get(EnvConfig.BASE_URL);
+        new WebDriverWait(driver, Duration.ofSeconds(EnvConfig.IMPLICIT_WAIT))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.id("root")));
     }
 
@@ -51,7 +50,7 @@ public class MainPage {
         return driver.findElement(arrowPointerPriceText).getText();
     }
 
-    void clickAcceptCookieBtn() {
+    public void clickAcceptCookieBtn() {
         driver.findElement(acceptCookieBtn).click();
     }
 
@@ -74,7 +73,7 @@ public class MainPage {
     void waitForNewBrowserTabOpened() {
         Set<String> numberOfTabsOpened = Collections.singleton(driver.getWindowHandle());
 
-        (new WebDriverWait(driver, Duration.ofSeconds(3))).
+        (new WebDriverWait(driver, Duration.ofSeconds(EnvConfig.EXPLICIT_WAIT))).
                 until(ExpectedConditions.numberOfWindowsToBe(numberOfTabsOpened.size() + 1));
     }
 
@@ -86,7 +85,7 @@ public class MainPage {
     void orderStatusEnterValue(String value) {
         driver.findElement(orderStatusText).click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        new WebDriverWait(driver, Duration.ofSeconds(EnvConfig.EXPLICIT_WAIT))
                 .until(ExpectedConditions.visibilityOfElementLocated(orderStatusField));
 
         driver.findElement(orderStatusField).sendKeys(value);

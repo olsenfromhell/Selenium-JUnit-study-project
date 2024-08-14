@@ -1,38 +1,33 @@
 package ru.services.praktikum.scooter.qa;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import ru.services.praktikum.DriverRule;
+import ru.services.praktikum.EnvConfig;
 
 import java.time.Duration;
 
-public class MainPageTests extends MainPage {
-    WebDriver driver = new ChromeDriver();
-    MainPage objMainPage = new MainPage(driver);
-    TrackingPage objTrackingPage = new TrackingPage(driver);
+public class MainPageTest extends MainPage {
 
+    @Rule
+    public DriverRule factory = new DriverRule();
 
-    public MainPageTests() {
+    public MainPageTest() {
         super();
-    }
-
-    @Before
-    public void setup() {
-        driver.get(mainPageUrl);
-        objMainPage.waitForPageLoaded();
-        objMainPage.clickAcceptCookieBtn();
     }
 
     // Тест проверяет текст в первой выпадашке аккордеона
     @Test
     public void checkArrowPointerText() {
+        WebDriver driver = factory.getDriver();
+        MainPage objMainPage = new MainPage(driver);
+
         String arrowPointerText;
 
+        objMainPage.openMainPage();
+        objMainPage.clickAcceptCookieBtn();
         objMainPage.arrowPointerPriceClick();
         arrowPointerText = objMainPage.arrowPointerPriceGetText();
 
@@ -42,18 +37,28 @@ public class MainPageTests extends MainPage {
     // Тест проверяет что при нажатии на логотип «Самоката», попадаешь на главную страницу «Самоката»
     @Test
     public void navigateToHomePageOnLogoClick() {
-        driver.get("https://qa-scooter.praktikum-services.ru/order");
+        WebDriver driver = factory.getDriver();
 
+        MainPage objMainPage = new MainPage(driver);
+        OrderPage objOrderPage = new OrderPage(driver);
+
+        objOrderPage.openOrderPage();
         objMainPage.clickOnSamokatLogo();
 
         String currentUrl = driver.getCurrentUrl();
 
-        Assert.assertEquals("После клика на логотип Самоката текущий URL не совпадает с заданным", mainPageUrl, currentUrl);
+        Assert.assertEquals("После клика на логотип Самоката текущий URL не совпадает с заданным", EnvConfig.BASE_URL, currentUrl);
     }
 
     // Тест проверяет что при нажатии на логотип Яндекса, в новом окне откроется главная страница Яндекса.
     @Test
     public void navigateToYandexPageOnLogoClick() {
+        WebDriver driver = factory.getDriver();
+
+        MainPage objMainPage = new MainPage(driver);
+
+        objMainPage.openMainPage();
+        objMainPage.clickAcceptCookieBtn();
         objMainPage.clickOnYandexLogo();
         objMainPage.waitForNewBrowserTabOpened();
 
@@ -67,22 +72,24 @@ public class MainPageTests extends MainPage {
     // и видит картинку "Такого заказа нет"
     @Test
     public void checkOrderStatusWithInvalidData() {
+        WebDriver driver = factory.getDriver();
+
+        MainPage objMainPage = new MainPage(driver);
+        TrackingPage objTrackingPage = new TrackingPage(driver);
+
         String trackOrderPageUrl = "https://qa-scooter.praktikum-services.ru/track?t=";
         String orderStatusNumber = "0000";
 
+        objMainPage.openMainPage();
+        objMainPage.clickAcceptCookieBtn();
         objMainPage.orderStatusEnterValue(orderStatusNumber);
         objMainPage.clickOrderStatusGoBtn();
 
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        new WebDriverWait(driver, Duration.ofSeconds(EnvConfig.EXPLICIT_WAIT))
                 .until(ExpectedConditions.visibilityOfElementLocated(objTrackingPage.orderNotFoundImage));
 
         Assert.assertEquals(
                 "Трекинг-ссылка отличается от ожидаемой", trackOrderPageUrl + orderStatusNumber, driver.getCurrentUrl()
         );
-    }
-
-    @After
-    public void quit() {
-        driver.quit();
     }
 }

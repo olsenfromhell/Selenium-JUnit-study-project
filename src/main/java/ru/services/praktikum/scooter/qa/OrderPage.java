@@ -5,6 +5,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import ru.services.praktikum.EnvConfig;
 
 import java.time.Duration;
 
@@ -49,6 +50,12 @@ public class OrderPage extends MainPage {
     protected final By rentScooterDeliveryAddressFieldErrorMessage = By.xpath("//*[contains(@class,'Input_ErrorMessage')][contains(text(),'Введите корректный адрес')]");
     protected final By rentScooterPhoneFieldErrorMessage = By.xpath("//*[contains(@class,'Input_ErrorMessage')][contains(text(),'Введите корректный номер')]");
 
+
+    public void openOrderPage() {
+        driver.get(EnvConfig.ORDER_PAGE);
+        new WebDriverWait(driver, Duration.ofSeconds(EnvConfig.IMPLICIT_WAIT))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.id("root")));
+    }
 
     // Заполнение формы "Для кого самокат"
     void fillRenterInfoForm(
@@ -97,7 +104,7 @@ public class OrderPage extends MainPage {
     }
 
     void waitForScooterOrderSuccessModal() {
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        new WebDriverWait(driver, Duration.ofSeconds(EnvConfig.EXPLICIT_WAIT))
                 .until(ExpectedConditions.visibilityOfElementLocated(rentScooterSuccessModal));
     }
 }

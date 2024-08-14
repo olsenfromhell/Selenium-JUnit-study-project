@@ -1,25 +1,23 @@
 package ru.services.praktikum.scooter.qa;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import ru.services.praktikum.DriverRule;
 
 @RunWith(Parameterized.class)
-public class OrderPageTests extends OrderPage {
+public class OrderPageTest extends OrderPage {
     private WebDriver driver;
-    private final MainPage objMainPage;
-    private final OrderPage objOrderPage;
 
+    @Rule
+    public DriverRule factory = new DriverRule();
 
-    public OrderPageTests(
+    public OrderPageTest(
             String renterName, String renterLastName, String renterScooterDeliveryAddress,
-            String renterMetroStation, String renterPhone, String browser
+            String renterMetroStation, String renterPhone
     ) {
         super.renterName = renterName;
         super.renterLastName = renterLastName;
@@ -27,34 +25,24 @@ public class OrderPageTests extends OrderPage {
         super.renterMetroStation = renterMetroStation;
         super.renterPhone = renterPhone;
 
-        if (browser.equals("chrome")) {
-            this.driver = new ChromeDriver();
-        } else if (browser.equals("firefox")) {
-            this.driver = new FirefoxDriver();
-        }
-
-        objMainPage = new MainPage(driver);
-        objOrderPage = new OrderPage(driver);
-    }
-
-    @Before
-    public void setup() {
-        driver.get(mainPageUrl);
-        objMainPage.waitForPageLoaded();
-        objMainPage.clickAcceptCookieBtn();
     }
 
     @Parameterized.Parameters
     public static Object[][] getRentalFormData() {
-        return new Object[][]{
-                {"Зумер", "Зумерский", "Москва, Большой Патриарший пер., 7, строение 1", "Маяковская", "+79966291337", "chrome"},
-                {"Зумер", "Зумерский", "Москва, Большой Патриарший пер., 7, строение 1", "Маяковская", "+79966291337", "firefox"}
+        return new Object[][] {
+                {"Зумер", "Зумерский", "Москва, Большой Патриарший пер., 7, строение 1", "Маяковская", "+79966291337" },
         };
     }
 
     // Тест делает заказ самоката по клику на кнопку 'Заказать' в шапке и проверяет наличие модалки об успешном заказе
     @Test
     public void rentScooterHeaderBtn() {
+        WebDriver driver = factory.getDriver();
+        MainPage objMainPage = new MainPage(driver);
+        OrderPage objOrderPage = new OrderPage(driver);
+
+        objMainPage.openMainPage();
+        objMainPage.clickAcceptCookieBtn();
         objMainPage.clickRentScooterHeaderBtn();
 
         objOrderPage.fillRenterInfoForm(
@@ -72,6 +60,12 @@ public class OrderPageTests extends OrderPage {
     // Тест делает заказ самоката по клику на кнопку 'Заказать' в середине страницы и проверяет наличие модалки об успешном заказе
     @Test
     public void rentScooterFooterBtn() {
+        WebDriver driver = factory.getDriver();
+        MainPage objMainPage = new MainPage(driver);
+        OrderPage objOrderPage = new OrderPage(driver);
+
+        objMainPage.openMainPage();
+        objMainPage.clickAcceptCookieBtn();
         objMainPage.clickRentScooterFooterBtn();
 
         objOrderPage.fillRenterInfoForm(
@@ -89,6 +83,12 @@ public class OrderPageTests extends OrderPage {
     // Тест проверяет ошибки для всех полей формы заказа
     @Test
     public void checkScooterOrderFormErrors() {
+        WebDriver driver = factory.getDriver();
+        MainPage objMainPage = new MainPage(driver);
+        OrderPage objOrderPage = new OrderPage(driver);
+
+        objMainPage.openMainPage();
+        objMainPage.clickAcceptCookieBtn();
         objMainPage.clickRentScooterFooterBtn();
 
         objOrderPage.fillRenterInfoForm(
@@ -112,11 +112,4 @@ public class OrderPageTests extends OrderPage {
                 driver.findElement(objOrderPage.rentScooterPhoneFieldErrorMessage).getText()
         );
     }
-
-
-    @After
-    public void quit() {
-        driver.quit();
-    }
-
 }
